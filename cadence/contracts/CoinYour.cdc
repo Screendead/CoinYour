@@ -1,7 +1,7 @@
 import FungibleToken from "./FungibleToken.cdc"
 import NonFungibleToken from "./NonFungibleToken.cdc"
 import FUSD from "./FUSD.cdc"
-import MetadataViews from 0x19f371da90427d40
+import MetadataViews from "./MetadataViews.cdc"
 
 pub contract CoinYour: NonFungibleToken {
   //declare variables
@@ -336,8 +336,8 @@ pub contract CoinYour: NonFungibleToken {
       //checks amount in CoinYour vault is at least as much as the set price (in the price array) for that edition of the word, if there is a prices
       (self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length == 0 && paymentVault.balance >= self.projectList[CoinYour.getProjectID(wordEditionID)]!.minimumPrice) || (self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length > 0 && paymentVault.balance >= self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices[CoinYour.getEditionID(wordEditionID)]) : "Could not mint NFT: payment balance insufficient."
       CoinYour.getEditionID(wordEditionID) > 0 : "Could not mint NFT: Edition out of range."
-      getCurrentBlock().timestamp > self.projectList[CoinYour.getProjectID(wordEditionID)]!.startDate : "Could not mint NFT: Project has not started yet."
-      getCurrentBlock().timestamp < self.projectList[CoinYour.getProjectID(wordEditionID)]!.endDate : "Could not mint NFT: Project has ended."
+      self.projectList[CoinYour.getProjectID(wordEditionID)]!.startDate == nil || getCurrentBlock().timestamp > self.projectList[CoinYour.getProjectID(wordEditionID)]!.startDate! : "Could not mint NFT: Project has not started yet."
+      self.projectList[CoinYour.getProjectID(wordEditionID)]!.endDate == nil || getCurrentBlock().timestamp < self.projectList[CoinYour.getProjectID(wordEditionID)]!.endDate! : "Could not mint NFT: Project has ended."
     }
 
     let share = paymentVault.balance / self.projectList[CoinYour.getProjectID(wordEditionID)]!.totalShares;
@@ -389,6 +389,8 @@ pub contract CoinYour: NonFungibleToken {
       website: String,
       active: Bool,
       minimumPrice: UFix64?,
+      startDate: UFix64?,
+      endDate: UFix64?,
       words: [String],
       prices: [UFix64],
       nftNameTemplate: [String],
@@ -408,6 +410,8 @@ pub contract CoinYour: NonFungibleToken {
         website: website,
         active: active,
         minimumPrice: minimumPrice ?? 0.0,
+        startDate: startDate,
+        endDate: endDate,
         words: words,
         prices: prices,
         nftNameTemplate: nftNameTemplate,
@@ -442,9 +446,9 @@ pub contract CoinYour: NonFungibleToken {
         website != nil : "Could not update project: website cannot be unset."
         website!.slice(from: 0, upTo: 7) == "http://" || website!.slice(from: 0, upTo: 8) == "https://" : "Could not register project: Website must start with http:// or https://"
         website!.slice(from: website!.length - 1, upTo: website!.length) == "/" : "Could not register project: Website must end with a slash"
-        words == nil || getCurrentBlock().timestamp < CoinYour.projectList[projectID]!.startDate : "Could not update words list: Project is currently active."
-        prices == nil || getCurrentBlock().timestamp < CoinYour.projectList[projectID]!.endDate : "Could not update prices: Project is no longer active."
-        startDate < endDate : "Could not update project: Start date must be before end date."
+        words == nil || CoinYour.projectList[projectID]!.startDate == nil || getCurrentBlock().timestamp < CoinYour.projectList[projectID]!.startDate! : "Could not update words list: Project is currently active."
+        prices == nil || CoinYour.projectList[projectID]!.endDate == nil || getCurrentBlock().timestamp < CoinYour.projectList[projectID]!.endDate! : "Could not update prices: Project is no longer active."
+        (startDate != nil && endDate != nil) && startDate! < endDate! : "Could not update project: Start date must be before end date."
       }
 
       let projectData = CoinYour.ProjectData(

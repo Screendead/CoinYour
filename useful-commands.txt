@@ -1,0 +1,15 @@
+Deploy to emulator:
+flow project deploy --network=emulator --update
+
+Remove from emulator:
+flow transactions send ./cadence/transactions/RemoveContract.cdc --network emulator --signer emulator-account
+
+Execute SIGNED arbitrary script on emulator:
+flow transactions send [file path] --network=emulator --signer=emulator-account
+flow transactions send ./admin/transactions/RegisterProject.cdc --network emulator --signer emulator-account
+flow transactions send ./admin/transactions/SetPrices.cdc --network emulator --signer emulator-account
+flow transactions send ./admin/transactions/SetWords.cdc --network emulator --signer emulator-account
+flow transactions send ./admin/transactions/SetNFTNameTemplate.cdc --network emulator --signer emulator-account
+flow transactions send ./admin/transactions/SetNFTDescriptionTemplate.cdc --network emulator --signer emulator-account
+
+flow accounts remove-contract CoinYour --network emulator --signer emulator-account && flow project deploy --network=emulator --update && flow transactions send ./admin/transactions/init.cdc --network emulator --signer emulator-account

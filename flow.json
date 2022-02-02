@@ -1,0 +1,62 @@
+{
+  "emulators": {
+    "default": {
+      "port": 3569,
+      "serviceAccount": "emulator-account"
+    }
+  },
+  "contracts": {
+    "CoinYour": "./cadence/contracts/CoinYour.cdc",
+    "MetadataViews": "./cadence/contracts/MetadataViews.cdc",
+    "FUSD": {
+      "source": "./cadence/contracts/FUSD.cdc",
+      "aliases": {
+        "testnet": "0xe223d8a629e49c68"
+      }
+    },
+    "FungibleToken": {
+      "source": "./cadence/contracts/FungibleToken.cdc",
+      "aliases": {
+        "testnet": "0x9a0766d93b6608b7"
+      }
+    },
+    "NonFungibleToken": {
+      "source": "./cadence/contracts/NonFungibleToken.cdc",
+      "aliases": {
+        "testnet": "0x631e88ae7f1d7c20"
+      }
+    }
+  },
+  "deployments": {
+    "emulator": {
+      "emulator-account": [
+        "FUSD",
+        "FungibleToken",
+        "NonFungibleToken",
+        "MetadataViews",
+        "CoinYour"
+      ]
+    },
+    "testnet": {
+      "testnet-account": [
+        "MetadataViews",
+        "CoinYour"
+      ]
+    }
+  },
+  "networks": {
+    "emulator": "127.0.0.1:3569",
+    "mainnet": "access.mainnet.nodes.onflow.org:9000",
+    "testnet": "access.devnet.nodes.onflow.org:9000"
+  },
+  "accounts": {
+    "emulator-account": {
+      "address": "f8d6e0586b0a20c7",
+      "key": "7fa8ae747eb9d2e093896aa8eba52798d02ceed301ce88c69baaa7ad5fc415c4"
+    },
+    "testnet-account": {
+      "address": "19f371da90427d40",
+      "key": "c095062848a71aea70bc70d45bc350302d91477899c66709543adc972f51329b"
+    }
+  }
+}
