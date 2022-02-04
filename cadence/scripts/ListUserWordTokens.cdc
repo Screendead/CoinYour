@@ -1,17 +1,16 @@
 import CoinYour from "../contracts/CoinYour.cdc"
 
-pub fun main(addr: Address): [UInt64]? {
+pub fun main(addr: Address): [UInt64] {
   let account = getAccount(addr)
   
-  if let ref = account.getCapability<&{CoinYour.ConstitutionWordsCollectionPublic}>(CoinYour.CollectionPublicPath)
-              .borrow() {
-                let words = ref.getIDs()
-                return words
-              }
+  if let ref = account.getCapability<&{CoinYour.CollectionPublic}>(CoinYour.CollectionPublicPath)
+    .borrow() {
+      let words = ref.getIDs()
+      return words
+    }
   
-  return nil
+  return []
 }
-`
 
 //OLD v2 - before contract 7
 //`

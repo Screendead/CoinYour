@@ -5,11 +5,10 @@ import {
   sendTransaction,
   executeScript
 } from "flow-js-testing"
-
-const FUSD_ADMIN = "emulator-account"
+import { getEmulatorAddress } from './CoinYour';
 
 export const deployFUSDContract = async () => {
-  const FUSDAdmin = await getAccountAddress(FUSD_ADMIN)
+  const FUSDAdmin = await getEmulatorAddress()
   await mintFlow(FUSDAdmin, "10.0")
   const addressMap = { FungibleToken: "0xee82856bf20e2aa6" }
   await deployContractByName({ to: FUSDAdmin, name: "FUSD", addressMap })
@@ -22,14 +21,14 @@ export const createFUSDVault = async (recipient) => {
 }
 
 export const createFUSDMinter = async () => {
-  const FUSDAdmin = await getAccountAddress(FUSD_ADMIN)
+  const FUSDAdmin = await getEmulatorAddress()
   const signers = [FUSDAdmin]
   const name = "CreateFUSDMinter"
   await sendTransaction({ signers, name })
 }
 
 export const mintFUSD = async (recipient, amount) => {
-  const FUSDAdmin = await getAccountAddress(FUSD_ADMIN)
+  const FUSDAdmin = await getEmulatorAddress()
   const signers = [FUSDAdmin]
   const args = [recipient, amount]
   const name = "MintFUSD"

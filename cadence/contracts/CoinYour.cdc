@@ -40,8 +40,11 @@ pub contract CoinYour: NonFungibleToken {
     pub var startDate: UFix64?;
     pub var endDate: UFix64?;
 
+    pub var messageMaxLength: Int?
+
     pub var words: [String];
     pub var prices: [UFix64];
+    pub var sequential: Bool;
     pub var nftNameTemplate: [String];
     pub var nftDescriptionTemplate: [String];
     pub var receivers: {Address: UFix64};
@@ -53,6 +56,7 @@ pub contract CoinYour: NonFungibleToken {
     init(
       name: String,
       description: String,
+      messageMaxLength: Int?,
       website: String, // Should be a URL to the project - can be a subdomain or subdirectory of a main website
       active: Bool,
       minimumPrice: UFix64?,
@@ -60,6 +64,7 @@ pub contract CoinYour: NonFungibleToken {
       endDate: UFix64?,
       words: [String],
       prices: [UFix64],
+      sequential: Bool,
       nftNameTemplate: [String],
       nftDescriptionTemplate: [String],
       receivers: {Address: UFix64},
@@ -67,6 +72,7 @@ pub contract CoinYour: NonFungibleToken {
     ) {
       self.name = name;
       self.description = description;
+      self.messageMaxLength = messageMaxLength;
       self.website = website;
       self.active = active;
       self.startDate = startDate;
@@ -74,6 +80,7 @@ pub contract CoinYour: NonFungibleToken {
       self.minimumPrice = minimumPrice ?? 0.0;
       self.words = words;
       self.prices = prices;
+      self.sequential = sequential;
       self.nftNameTemplate = nftNameTemplate;
       self.nftDescriptionTemplate = nftDescriptionTemplate;
       self.receivers = receivers;
@@ -330,9 +337,11 @@ pub contract CoinYour: NonFungibleToken {
   pub fun mintNFT(wordEditionID: UInt64, messageToMint: String, author: Address, imageURL: String, paymentVault: @FungibleToken.Vault): @NFT {
     pre {
       //these conditions must be true
+      CoinYour.projectList[CoinYour.getProjectID(wordEditionID)]!.messageMaxLength == nil || messageToMint.length <= CoinYour.projectList[CoinYour.getProjectID(wordEditionID)]!.messageMaxLength! : "Message is longer than the maximum allowed length for this project"
       self.projectList[CoinYour.getProjectID(wordEditionID)] != nil : "Could not mint NFT: Project does not exist"
       self.projectList[CoinYour.getProjectID(wordEditionID)]!.active : "Could not mint NFT: Project is currently inactive"
       self.projectList[CoinYour.getProjectID(wordEditionID)]!.words[CoinYour.getWordID(wordEditionID)] != nil : "Could not mint NFT: NFT with given ID does not exist."
+      !self.projectList[CoinYour.getProjectID(wordEditionID)]!.sequential || self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length == 0 || (CoinYour.getEditionID(wordEditionID) == UInt64(self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length - 1) || CoinYour.allMintedWords[wordEditionID + 0b0000_0000000000000_0001] != nil) : "Could not mint NFT: Sequential NFTs must be minted in sequence"
       //checks amount in CoinYour vault is at least as much as the set price (in the price array) for that edition of the word, if there is a prices
       (self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length == 0 && paymentVault.balance >= self.projectList[CoinYour.getProjectID(wordEditionID)]!.minimumPrice) || (self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length > 0 && paymentVault.balance >= self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices[CoinYour.getEditionID(wordEditionID)]) : "Could not mint NFT: payment balance insufficient."
       CoinYour.getEditionID(wordEditionID) > 0 : "Could not mint NFT: Edition out of range."
@@ -380,12 +389,13 @@ pub contract CoinYour: NonFungibleToken {
   }
 
   //administrative functions
-//?? why can't anyone run these functions?
+  //?? why can't anyone run these functions?
   pub resource Admin {
     pub fun registerProject(
       id: UInt64,
       name: String,
       description: String,
+      messageMaxLength: Int?,
       website: String,
       active: Bool,
       minimumPrice: UFix64?,
@@ -393,6 +403,7 @@ pub contract CoinYour: NonFungibleToken {
       endDate: UFix64?,
       words: [String],
       prices: [UFix64],
+      sequential: Bool,
       nftNameTemplate: [String],
       nftDescriptionTemplate: [String],
       receivers: {Address: UFix64},
@@ -402,11 +413,13 @@ pub contract CoinYour: NonFungibleToken {
         CoinYour.projectList[id] == nil : "Could not register project: Project already exists"
         website.slice(from: 0, upTo: 7) == "http://" || website.slice(from: 0, upTo: 8) == "https://" : "Could not register project: Website must start with http:// or https://"
         website.slice(from: website.length - 1, upTo: website.length) == "/" : "Could not register project: Website must end with a slash"
+        prices.length != 0 || !sequential : "Could not register project: Sequential projects must have a price array"
       }
 
       let projectData = CoinYour.ProjectData(
         name: name,
         description: description,
+        messageMaxLength: messageMaxLength,
         website: website,
         active: active,
         minimumPrice: minimumPrice ?? 0.0,
@@ -414,13 +427,12 @@ pub contract CoinYour: NonFungibleToken {
         endDate: endDate,
         words: words,
         prices: prices,
+        sequential: sequential,
         nftNameTemplate: nftNameTemplate,
         nftDescriptionTemplate: nftDescriptionTemplate,
         receivers: receivers,
         metadata: metadata,
       );
-
-      projectData.calculateTotalShares();
 
       CoinYour.projectList[id] = projectData;
     }
@@ -429,6 +441,7 @@ pub contract CoinYour: NonFungibleToken {
       projectID: UInt64,
       name: String?,
       description:String?,
+      messageMaxLength: Int?,
       website: String?,
       active: Bool?,
       minimumPrice: UFix64?,
@@ -454,6 +467,7 @@ pub contract CoinYour: NonFungibleToken {
       let projectData = CoinYour.ProjectData(
         name: name ?? CoinYour.projectList[projectID]!.name,
         description: description ?? CoinYour.projectList[projectID]!.description,
+        messageMaxLength: messageMaxLength ?? CoinYour.projectList[projectID]!.messageMaxLength,
         website: website ?? CoinYour.projectList[projectID]!.website,
         active: active ?? CoinYour.projectList[projectID]!.active,
         minimumPrice: minimumPrice ?? CoinYour.projectList[projectID]!.minimumPrice,
@@ -461,6 +475,7 @@ pub contract CoinYour: NonFungibleToken {
         endDate: endDate ?? CoinYour.projectList[projectID]!.endDate,
         words: words ?? CoinYour.projectList[projectID]!.words,
         prices: prices ?? CoinYour.projectList[projectID]!.prices,
+        sequential: CoinYour.projectList[projectID]!.sequential, // Cannot be changed after project creation.
         nftNameTemplate: nftNameTemplate ?? CoinYour.projectList[projectID]!.nftNameTemplate,
         nftDescriptionTemplate: nftDescriptionTemplate ?? CoinYour.projectList[projectID]!.nftDescriptionTemplate,
         receivers: receivers ?? CoinYour.projectList[projectID]!.receivers,

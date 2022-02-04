@@ -58,15 +58,20 @@ export const registerProject = async (signer, projectInfo) => {
   //   projectInfo.metadata,
   // ]
   const args = Object.values(projectInfo);
-  console.log('Args:', args);
-  await sendTransaction({ signers, name, args: [1] })
+  await sendTransaction({ signers, name, args: args })
 }
 
 export const mintWordToken = async (recipient, wordToken) => {
   const name = "MintWordToken"
   const signers = [recipient]
-  const args = [wordToken.templateID, wordToken.price]
-  await sendTransaction({ signers, name, args })
+  const args = [
+    wordToken.wordEditionID,
+    wordToken.messageToMint,
+    wordToken.author,
+    wordToken.imageURL,
+    wordToken.amount,
+  ]
+  return sendTransaction({ signers, name, args })
 }
 
 export const listUserWordTokens = async (recipient) => {

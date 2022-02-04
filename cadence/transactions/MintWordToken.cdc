@@ -11,7 +11,7 @@
       if acct.borrow<&CoinYour.Collection>(from: CoinYour.CollectionStoragePath) == nil {
         let collection <- CoinYour.createEmptyCollection()
         acct.save<@CoinYour.Collection>(<-collection, to: CoinYour.CollectionStoragePath)
-        acct.link<&{CoinYour.ConstitutionWordsCollectionPublic}>(CoinYour.CollectionPublicPath, target: CoinYour.CollectionStoragePath) 
+        acct.link<&{CoinYour.CollectionPublic}>(CoinYour.CollectionPublicPath, target: CoinYour.CollectionStoragePath) 
         }
 
       self.receiverReference = acct.borrow<&CoinYour.Collection>(from: CoinYour.CollectionStoragePath)

@@ -4212,8 +4212,8 @@
       }
     },
     "node_modules/flow-cadut": {
-      "version": "0.1.14",
-      "resolved": "https://registry.npmjs.org/flow-cadut/-/flow-cadut-0.1.14.tgz",
+      "version": "0.1.15-alpha.12",
+      "resolved": "https://registry.npmjs.org/flow-cadut/-/flow-cadut-0.1.15-alpha.12.tgz",
       "integrity": "sha512-/s3lmfR/Ojt/7RS56otR48RjHgIaSDi5+bNWa7DHZUDZk2Q7VLxhN4yFD9PQoRjNfxmuL4vzG+G7FTDXG3Y6/g==",
       "dev": true,
       "dependencies": {
@@ -13674,8 +13674,7 @@
       }
     },
     "flow-cadut": {
-      "version": "0.1.14",
-      "resolved": "https://registry.npmjs.org/flow-cadut/-/flow-cadut-0.1.14.tgz",
+      "version": "https://registry.npmjs.org/flow-cadut/-/flow-cadut-0.1.15-alpha.12.tgz",
       "integrity": "sha512-/s3lmfR/Ojt/7RS56otR48RjHgIaSDi5+bNWa7DHZUDZk2Q7VLxhN4yFD9PQoRjNfxmuL4vzG+G7FTDXG3Y6/g==",
       "dev": true,
       "requires": {

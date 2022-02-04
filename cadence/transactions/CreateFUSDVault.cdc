@@ -3,7 +3,6 @@ import FUSD from "../contracts/FUSD.cdc"
 
 transaction {
   prepare(signer: AuthAccount) {
-
     if(signer.borrow<&FUSD.Vault>(from: /storage/fusdVault) != nil) {
       return
     }
