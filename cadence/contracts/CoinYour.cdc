@@ -336,15 +336,16 @@ pub contract CoinYour: NonFungibleToken {
   
   pub fun mintNFT(wordEditionID: UInt64, messageToMint: String, author: Address, imageURL: String, paymentVault: @FungibleToken.Vault): @NFT {
     pre {
-      //these conditions must be true
-      CoinYour.projectList[CoinYour.getProjectID(wordEditionID)]!.messageMaxLength == nil || messageToMint.length <= CoinYour.projectList[CoinYour.getProjectID(wordEditionID)]!.messageMaxLength! : "Message is longer than the maximum allowed length for this project"
       self.projectList[CoinYour.getProjectID(wordEditionID)] != nil : "Could not mint NFT: Project does not exist"
+      //these conditions must be true
+      CoinYour.getEditionID(wordEditionID) >= 0 : "Could not mint NFT: Edition out of range."
+      CoinYour.projectList[CoinYour.getProjectID(wordEditionID)]!.prices == nil || CoinYour.getEditionID(wordEditionID) < UInt64(CoinYour.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length) : "Could not mint NFT: Edition out of range."
+      CoinYour.projectList[CoinYour.getProjectID(wordEditionID)]!.messageMaxLength == nil || messageToMint.length <= CoinYour.projectList[CoinYour.getProjectID(wordEditionID)]!.messageMaxLength! : "Message is longer than the maximum allowed length for this project"
       self.projectList[CoinYour.getProjectID(wordEditionID)]!.active : "Could not mint NFT: Project is currently inactive"
       self.projectList[CoinYour.getProjectID(wordEditionID)]!.words[CoinYour.getWordID(wordEditionID)] != nil : "Could not mint NFT: NFT with given ID does not exist."
       !self.projectList[CoinYour.getProjectID(wordEditionID)]!.sequential || self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length == 0 || (CoinYour.getEditionID(wordEditionID) == UInt64(self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length - 1) || CoinYour.allMintedWords[wordEditionID + 0b0000_0000000000000_0001] != nil) : "Could not mint NFT: Sequential NFTs must be minted in sequence"
       //checks amount in CoinYour vault is at least as much as the set price (in the price array) for that edition of the word, if there is a prices
       (self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length == 0 && paymentVault.balance >= self.projectList[CoinYour.getProjectID(wordEditionID)]!.minimumPrice) || (self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices.length > 0 && paymentVault.balance >= self.projectList[CoinYour.getProjectID(wordEditionID)]!.prices[CoinYour.getEditionID(wordEditionID)]) : "Could not mint NFT: payment balance insufficient."
-      CoinYour.getEditionID(wordEditionID) > 0 : "Could not mint NFT: Edition out of range."
       self.projectList[CoinYour.getProjectID(wordEditionID)]!.startDate == nil || getCurrentBlock().timestamp > self.projectList[CoinYour.getProjectID(wordEditionID)]!.startDate! : "Could not mint NFT: Project has not started yet."
       self.projectList[CoinYour.getProjectID(wordEditionID)]!.endDate == nil || getCurrentBlock().timestamp < self.projectList[CoinYour.getProjectID(wordEditionID)]!.endDate! : "Could not mint NFT: Project has ended."
     }

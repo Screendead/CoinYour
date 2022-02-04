@@ -116,7 +116,7 @@ describe("CoinYour", () => {
       ...TEST_PROJECT
     });
 
-    const recipient = await getAccountAddress("Seller")
+    const recipient = await getAccountAddress("Buyer")
     await mintFlow(recipient, "10.00000000")
     await fundAccountWithFUSD(recipient, "100.00000000")
 
@@ -150,7 +150,7 @@ describe("CoinYour", () => {
       ...TEST_PROJECT
     });
 
-    const recipient = await getAccountAddress("Jack")
+    const recipient = await getAccountAddress("Buyer")
     await mintFlow(recipient, "10.00000000")
     await fundAccountWithFUSD(recipient, "0.50000000") // Price of edition 13 is 1.00000000
 
@@ -175,7 +175,7 @@ describe("CoinYour", () => {
       ...TEST_PROJECT
     });
 
-    const recipient = await getAccountAddress("Jack")
+    const recipient = await getAccountAddress("Buyer")
     await mintFlow(recipient, "10.00000000")
     await fundAccountWithFUSD(recipient, "100.00000000")
 
@@ -202,7 +202,7 @@ describe("CoinYour", () => {
       ...TEST_PROJECT
     });
 
-    const recipient = await getAccountAddress("Jack")
+    const recipient = await getAccountAddress("Buyer")
     await mintFlow(recipient, "10.00000000")
     await fundAccountWithFUSD(recipient, "100.00000000")
 
@@ -210,6 +210,76 @@ describe("CoinYour", () => {
     await createCoinYourCollection(recipient)
 
     TEST_WORD_TOKEN.wordEditionID = (1 << 17) + (5 << 4) + (6 << 0); // Edition 6 of 13
+
+    let txResult = await shallRevert(
+      mintWordToken(recipient, TEST_WORD_TOKEN)
+    );
+    let balance = await getFUSDBalance(recipient)
+
+    expect(txResult).not.toBeDefined(); // shallRevert should return undefined if it mintWordToken fails
+    expect(balance).toBe("100.00000000"); // Balance should not change if transaction fails
+  })
+
+
+  it("Should mint all tokens from Edition 13 down to Edition 1", async () => {
+    // Register Project
+    const signer = await getAccountAddress("AdminAccount")
+    await mintFlow(signer, "10.00000000")
+    await registerProject(signer, {
+      id: 1,
+      ...TEST_PROJECT
+    });
+
+    const recipient = await getAccountAddress("Buyer")
+    await mintFlow(recipient, "10.00000000")
+    await fundAccountWithFUSD(recipient, "8192.00000000")
+
+    // // Mint Word Token
+    await createCoinYourCollection(recipient)
+
+    let expectedResult = [];
+
+    for (let i = 13; i > 0; i--) {
+      TEST_WORD_TOKEN.wordEditionID = (1 << 17) + (12 << 4) + (i << 0);
+      TEST_WORD_TOKEN.amount = TEST_PROJECT.prices[i - 1],
+      expectedResult.push(TEST_WORD_TOKEN.wordEditionID);
+      console.log(i);
+
+      await mintWordToken(recipient, TEST_WORD_TOKEN)
+    }
+
+    let balance = await getFUSDBalance(recipient)
+
+    const userWordTokens = (await listUserWordTokens(recipient)).sort((a, b) => a - b);
+
+    const jack = await getAccountAddress("Jack");
+    const chris = await getAccountAddress("Chris");
+    let jackBalance = await getFUSDBalance(jack);
+    let chrisBalance = await getFUSDBalance(chris);
+
+    expect(userWordTokens).toMatchObject(expectedResult.sort((a, b) => a - b))
+    expect(balance).toBe("1.00000000");
+    expect(jackBalance).toBe("4095.50000000");
+    expect(chrisBalance).toBe("4095.50000000");
+  })
+
+  it("Should fail to mint a word token due to the edition number being too high", async () => {
+    // Register Project
+    const signer = await getAccountAddress("AdminAccount")
+    await mintFlow(signer, "10.00000000")
+    await registerProject(signer, {
+      id: 1,
+      ...TEST_PROJECT
+    });
+
+    const recipient = await getAccountAddress("Buyer")
+    await mintFlow(recipient, "10.00000000")
+    await fundAccountWithFUSD(recipient, "100.00000000")
+
+    // // Mint Word Token
+    await createCoinYourCollection(recipient)
+
+    TEST_WORD_TOKEN.wordEditionID = (1 << 17) + (5 << 4) + (14 << 0); // Edition 14 of 13 !!
 
     let txResult = await shallRevert(
       mintWordToken(recipient, TEST_WORD_TOKEN)
