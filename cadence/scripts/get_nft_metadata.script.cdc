@@ -1,5 +1,5 @@
 
-  import CoinYour from 0xWordToken
+  import CoinYour from "../contracts/CoinYour.cdc"
   import MetadataViews from 0xMetadataViews
 
   let collection = account.getCapability(CoinYour.CollectionPublicPath)

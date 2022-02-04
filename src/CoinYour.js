@@ -6,7 +6,7 @@ import {
   executeScript
 } from "flow-js-testing"
 
-export const getEmulatorAddress = async () => getAccountAddress("emulator-account")
+export const getEmulatorAddress = async () => getAccountAddress("AdminAccount")
 
 export const deployContracts = async () => {
   const emulatorAddress = await getEmulatorAddress()
@@ -29,14 +29,44 @@ export const deployContracts = async () => {
 export const createCoinYourCollection = async (recipient) => {
   const name = "CreateCollection"
   const signers = [recipient]
-  await sendTransaction({ name, signers })
+  await sendTransaction({ signers, name })
+}
+
+export const getProjects = async () => {
+  const name = "GetProjects"
+  const res = await executeScript({ name })
+  return res;
+}
+
+export const registerProject = async (signer, projectInfo) => {
+  const name = "RegisterProject"
+  const signers = [signer]
+  // const args = [
+  //   projectInfo.id,
+  //   projectInfo.name,
+  //   projectInfo.description,
+  //   projectInfo.website,
+  //   projectInfo.active,
+  //   projectInfo.minimumPrice,
+  //   projectInfo.startDate,
+  //   projectInfo.endDate,
+  //   projectInfo.words,
+  //   projectInfo.prices,
+  //   projectInfo.nftNameTemplate,
+  //   projectInfo.nftDescriptionTemplate,
+  //   projectInfo.receivers,
+  //   projectInfo.metadata,
+  // ]
+  const args = Object.values(projectInfo);
+  console.log('Args:', args);
+  await sendTransaction({ signers, name, args: [1] })
 }
 
 export const mintWordToken = async (recipient, wordToken) => {
   const name = "MintWordToken"
   const signers = [recipient]
   const args = [wordToken.templateID, wordToken.price]
-  await sendTransaction({ name, args, signers })
+  await sendTransaction({ signers, name, args })
 }
 
 export const listUserWordTokens = async (recipient) => {

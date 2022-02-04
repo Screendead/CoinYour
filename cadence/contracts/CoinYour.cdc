@@ -212,7 +212,7 @@ pub contract CoinYour: NonFungibleToken {
     }
   }
 
-  pub resource interface ConstitutionWordsCollectionPublic {
+  pub resource interface CollectionPublic {
     pub fun deposit(token: @NonFungibleToken.NFT)
     pub fun getIDs(): [UInt64]
     pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
@@ -227,7 +227,7 @@ pub contract CoinYour: NonFungibleToken {
     pub fun deposit(token: @NFT)
   }
 
-  pub resource Collection: ConstitutionWordsCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+  pub resource Collection: CollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
     pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
 
     pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {

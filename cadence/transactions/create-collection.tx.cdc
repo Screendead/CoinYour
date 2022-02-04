@@ -1,4 +1,4 @@
-import CoinYour from 0xWordToken
+import CoinYour from "../contracts/CoinYour.cdc"
 
 transaction {
     prepare(acct: AuthAccount) {

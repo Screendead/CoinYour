@@ -1,7 +1,7 @@
-  import CoinYour from 0xWordToken
-  import FUSD from 0xFUSD
-  import FungibleToken from 0xFungibleToken
-  import NonFungibleToken from 0xNonFungibleToken
+  import CoinYour from "../contracts/CoinYour.cdc"
+  import FUSD from "../contracts/FUSD.cdc"
+  import FungibleToken from "../contracts/FungibleToken.cdc"
+  import NonFungibleToken from "../contracts/NonFungibleToken.cdc"
 
   transaction(wordEditionID: UInt64, messageToMint: String, author: Address, imageURL: String, amount: UFix64) {
     let receiverReference: &CoinYour.Collection

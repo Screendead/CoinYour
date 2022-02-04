@@ -1,4 +1,4 @@
-import CoinYour from 0xWordToken
+import CoinYour from "../contracts/CoinYour.cdc"
 
 pub fun main(addr: Address): [UInt64]? {
   let account = getAccount(addr)
@@ -16,7 +16,7 @@ pub fun main(addr: Address): [UInt64]? {
 //OLD v2 - before contract 7
 //`
 
-// import CoinYour from 0xWordToken
+// import CoinYour from "../contracts/CoinYour.cdc"
 
 // pub fun main(addr: Address): {UInt64: CoinYour.WordEdition}? {
 //   let account = getAccount(addr)
@@ -38,7 +38,7 @@ pub fun main(addr: Address): [UInt64]? {
 
 //OLD v1
 // `
-//   import ExampleNFT from 0xWordToken
+//   import ExampleNFT from "../contracts/CoinYour.cdc"
 //   import NonFungibleToken from 0x632e88ae7f2d7c20
   
 // //  pub fun main(addr: Address): [UInt64]? {
