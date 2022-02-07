@@ -10,9 +10,17 @@
     prepare(acct: AuthAccount) {
       if acct.borrow<&CoinYour.Collection>(from: CoinYour.CollectionStoragePath) == nil {
         let collection <- CoinYour.createEmptyCollection()
+
         acct.save<@CoinYour.Collection>(<-collection, to: CoinYour.CollectionStoragePath)
-        acct.link<&{CoinYour.CollectionPublic}>(CoinYour.CollectionPublicPath, target: CoinYour.CollectionStoragePath) 
-        }
+        acct.link<&{CoinYour.CollectionPublic}>(CoinYour.CollectionPublicPath, target: CoinYour.CollectionStoragePath)
+      }
+
+      if acct.borrow<&CoinYour.FinishedPieceCollection>(from: CoinYour.FinishedPieceCollectionStoragePath) == nil {
+        let finishedPieceCollection <- CoinYour.createEmptyFinishedPieceCollection()
+
+        acct.save<@CoinYour.FinishedPieceCollection>(<-finishedPieceCollection, to: CoinYour.FinishedPieceCollectionStoragePath)
+        acct.link<&{CoinYour.FinishedPieceCollectionPublic}>(CoinYour.FinishedPieceCollectionPublicPath, target: CoinYour.FinishedPieceCollectionStoragePath)
+      }
 
       self.receiverReference = acct.borrow<&CoinYour.Collection>(from: CoinYour.CollectionStoragePath)
         ?? panic("Cannot borrow Collection")

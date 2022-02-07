@@ -6,6 +6,7 @@ import MetadataViews from "./MetadataViews.cdc"
 pub contract CoinYour: NonFungibleToken {
   //declare variables
   pub var totalSupply: UInt64
+  pub var stablecoinToFlow: UFix64; // Conversion rate between Flow and USD Stablecoin
 
   access(contract) let projectList: {UInt64: ProjectData}
 
@@ -13,9 +14,13 @@ pub contract CoinYour: NonFungibleToken {
 
   pub let CollectionStoragePath: StoragePath
   pub let CollectionPublicPath: PublicPath
+  pub let FinishedPieceCollectionStoragePath: StoragePath
+  pub let FinishedPieceCollectionPublicPath: PublicPath
   pub let AdminStoragePath: StoragePath
 
-  //declare events
+  pub let metadata: {String: AnyStruct}
+
+  // Declare events
   pub event ContractInitialized()
   pub event Withdraw(id: UInt64, from: Address?)
   pub event Deposit(id: UInt64, to: Address?)
@@ -114,8 +119,11 @@ pub contract CoinYour: NonFungibleToken {
     pub let author: Address
     pub let mintedAt: UFix64
     pub let image: MetadataViews.IPFSFile
+    pub let price: UFix64
 
-    init(wordEditionID: UInt64, word: String, message: String, author: Address, imageURL: String) {
+    pub var metadata: {String: AnyStruct}
+
+    init(wordEditionID: UInt64, word: String, message: String, author: Address, imageURL: String, price: UFix64, metadata: {String: AnyStruct}) {
       self.wordEditionID = wordEditionID
       self.word = word
       self.message = message
@@ -124,6 +132,8 @@ pub contract CoinYour: NonFungibleToken {
       //CID is the content identifier for the IPFS file.
       //It is the path without the IPFS prefix
       self.image = MetadataViews.IPFSFile(url: imageURL, path: nil)
+      self.price = price
+      self.metadata = metadata
     }
   }
 
@@ -132,7 +142,9 @@ pub contract CoinYour: NonFungibleToken {
     pub let id: UInt64
     pub let data: WordEdition
 
-    init(id: UInt64, data: WordEdition) {
+    pub var metadata: {String: AnyStruct}
+
+    init(id: UInt64, data: WordEdition, metadata: {String: AnyStruct}) {
       pre {
         CoinYour.projectList[CoinYour.getProjectID(id)] != nil : "Could not mint NFT: Project does not exist"
         CoinYour.projectList[CoinYour.getProjectID(id)]!.active : "Could not mint NFT: Project is not active"
@@ -143,6 +155,7 @@ pub contract CoinYour: NonFungibleToken {
 
       self.id = id;
       self.data = data;
+      self.metadata = metadata;
     }
 
     priv fun generateFromTemplate(template: [String]): String {
@@ -226,6 +239,12 @@ pub contract CoinYour: NonFungibleToken {
     pub fun borrowConstitutionWord(id: UInt64): &NFT?
   }
 
+  pub resource interface FinishedPieceCollectionPublic {
+    pub fun deposit(token: @NonFungibleToken.NFT)
+    pub fun getIDs(): [UInt64]
+    pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+  }
+
   pub resource interface Provider {
     pub fun withdraw(withdrawID: UInt64): @NFT
   }
@@ -277,8 +296,46 @@ pub contract CoinYour: NonFungibleToken {
     }
   }
 
+  pub resource FinishedPieceCollection: FinishedPieceCollectionPublic, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic {
+    pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT}
+
+    pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+      let token <- self.ownedNFTs.remove(key: withdrawID) 
+        ?? panic("Could not withdraw NFT: NFT does not exist in collection")
+
+      // I think that emit here is important, as it will allow us to see if anyone has bought / transfered a WordNFT
+      emit Withdraw(id: withdrawID, from: self.owner?.address)
+      return <-token
+    }
+
+    pub fun deposit(token: @NonFungibleToken.NFT) {
+      let oldToken <- self.ownedNFTs[token.id] <- token
+      destroy oldToken
+    }
+
+    pub fun getIDs(): [UInt64] {
+      return self.ownedNFTs.keys
+    }
+
+    pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+      return &self.ownedNFTs[id] as &NonFungibleToken.NFT
+    }
+
+    destroy() {
+      destroy self.ownedNFTs
+    }
+
+    init() {
+      self.ownedNFTs <- {}
+    }
+  }
+
   pub fun createEmptyCollection(): @Collection {
     return <-create self.Collection()
+  }
+
+  pub fun createEmptyFinishedPieceCollection(): @FinishedPieceCollection {
+    return <-create self.FinishedPieceCollection()
   }
 
   // returns all words that have been minted on a proiect
@@ -350,6 +407,8 @@ pub contract CoinYour: NonFungibleToken {
       self.projectList[CoinYour.getProjectID(wordEditionID)]!.endDate == nil || getCurrentBlock().timestamp < self.projectList[CoinYour.getProjectID(wordEditionID)]!.endDate! : "Could not mint NFT: Project has ended."
     }
 
+    let initialBalance: UFix64 = paymentVault.balance
+
     let share = paymentVault.balance / self.projectList[CoinYour.getProjectID(wordEditionID)]!.totalShares;
 
     //splits payment vault accross receivers accounts (as defined by Admin)
@@ -373,25 +432,35 @@ pub contract CoinYour: NonFungibleToken {
 
     destroy paymentVault;
 
-
     let minted = WordEdition(
       wordEditionID: wordEditionID,
       word: self.projectList[CoinYour.getProjectID(wordEditionID)]!.words[CoinYour.getWordID(wordEditionID)],
       message: messageToMint,
       author: author,
       imageURL: imageURL,
+      price: initialBalance,
+      metadata: {},
     );
 
-    //adds newly minted word to the contract dictionary
+    // Adds newly minted word to the contract dictionary
     self.allMintedWords[wordEditionID] = minted
     self.totalSupply = self.totalSupply + 1
     emit Deposit(id: wordEditionID, to: author)
-    return <- create NFT(id: wordEditionID, data: minted);
+    return <- create NFT(id: wordEditionID, data: minted, metadata: {});
   }
 
-  //administrative functions
-  //?? why can't anyone run these functions?
+  // Administrative functions
   pub resource Admin {
+    pub fun updateMetadata(metadata: {String: AnyStruct}) {
+      for key in metadata.keys {
+        CoinYour.metadata[key] = metadata[key]
+      }
+    }
+
+    pub fun updateConversionRate(conversionRate: UFix64) {
+      CoinYour.stablecoinToFlow = conversionRate
+    }
+
     pub fun registerProject(
       id: UInt64,
       name: String,
@@ -527,11 +596,16 @@ pub contract CoinYour: NonFungibleToken {
 
   init() {
     self.totalSupply = 0;
+    self.stablecoinToFlow = 1.0
+
     self.CollectionStoragePath = /storage/CoinYourCollection
     self.CollectionPublicPath = /public/CoinYourCollectionPublic
+    self.FinishedPieceCollectionStoragePath = /storage/CoinYourFinishedPieceCollection
+    self.FinishedPieceCollectionPublicPath = /public/CoinYourFinishedPieceCollectionPublic
     self.AdminStoragePath = /storage/CoinYourAdmin
     self.allMintedWords = {}
     self.projectList = {}
+    self.metadata = {}
 
     if(self.account.borrow<&Admin>(from: self.AdminStoragePath) != nil) {
       return
