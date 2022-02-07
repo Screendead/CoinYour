@@ -47,13 +47,7 @@ const TEST_PROJECT = {
   metadata: {},
 };
 
-const TEST_WORD_TOKEN = {
-  wordEditionID: (1 << 17) + (5 << 4) + (13 << 0),
-  messageToMint: "Hello, world!",
-  author: "0x0000000000000000", 
-  imageURL: "https://example.com/image.png",
-  amount: "1.00000000",
-}
+let TEST_WORD_TOKEN;
 
 describe("CoinYour", () => {
   beforeEach(async () => {
@@ -73,6 +67,14 @@ describe("CoinYour", () => {
 
     TEST_PROJECT.receivers[jack] = "100.00000000";
     TEST_PROJECT.receivers[chris] = "100.00000000";
+
+    TEST_WORD_TOKEN = {
+      wordEditionID: (1 << 17) + (5 << 4) + (13 << 0),
+      messageToMint: "Hello, world!",
+      author: "0x0000000000000000",
+      imageURL: "https://example.com/image.png",
+      amount: "1.00000000",
+    };
 
     return em;
   });
@@ -219,7 +221,6 @@ describe("CoinYour", () => {
     expect(txResult).not.toBeDefined(); // shallRevert should return undefined if it mintWordToken fails
     expect(balance).toBe("100.00000000"); // Balance should not change if transaction fails
   })
-
 
   it("Should mint all tokens from Edition 13 down to Edition 1", async () => {
     // Register Project
