@@ -4212,24 +4212,62 @@
       }
     },
     "node_modules/flow-cadut": {
-      "version": "0.1.15-alpha.12",
-      "resolved": "https://registry.npmjs.org/flow-cadut/-/flow-cadut-0.1.15-alpha.12.tgz",
-      "integrity": "sha512-/s3lmfR/Ojt/7RS56otR48RjHgIaSDi5+bNWa7DHZUDZk2Q7VLxhN4yFD9PQoRjNfxmuL4vzG+G7FTDXG3Y6/g==",
+      "version": "0.1.15",
+      "resolved": "https://registry.npmjs.org/flow-cadut/-/flow-cadut-0.1.15.tgz",
+      "integrity": "sha512-77lFJvhTGckWtnX/BV25qfe0/wsFbmeBRrRGycWa0uzZeVJV1RSk4VmtGkwHfO32Ndi7Du+87SCV92JUegV/ig==",
       "dev": true,
       "dependencies": {
         "@onflow/config": "0.0.2",
-        "@onflow/fcl": "^0.0.77",
+        "@onflow/fcl": "^0.0.78",
         "@onflow/types": "^0.0.6",
+        "elliptic": "^6.5.4",
         "esm": "^3.2.25",
         "handlebars": "^4.7.7",
         "handlebars-loader": "^1.7.1",
         "prettier": "^2.3.0",
         "rimraf": "^3.0.2",
+        "rlp": "^3.0.0",
+        "sha3": "^2.1.4",
         "simple-git": "^2.40.0",
         "yargs": "^15.4.1"
       },
       "bin": {
         "flow-generate": "bin/generate.js"
+      }
+    },
+    "node_modules/flow-cadut/node_modules/@onflow/fcl": {
+      "version": "0.0.78",
+      "resolved": "https://registry.npmjs.org/@onflow/fcl/-/fcl-0.0.78.tgz",
+      "integrity": "sha512-zWtzCjG2URWXLblSsXiSKr3qBroq2BSVGsZrWeosbmup/03fb/MJ10w3ECF83Cd2m/M0TevSSp+hcpdBVLZSfw==",
+      "dev": true,
+      "dependencies": {
+        "@onflow/interaction": "0.0.11",
+        "@onflow/rlp": "0.0.3",
+        "@onflow/sdk": "0.0.56",
+        "@onflow/types": "0.0.6",
+        "@onflow/util-actor": "0.0.2",
+        "@onflow/util-address": "0.0.0",
+        "@onflow/util-invariant": "0.0.0",
+        "@onflow/util-template": "0.0.1",
+        "@onflow/util-uid": "0.0.1"
+      }
+    },
+    "node_modules/flow-cadut/node_modules/@onflow/sdk": {
+      "version": "0.0.56",
+      "resolved": "https://registry.npmjs.org/@onflow/sdk/-/sdk-0.0.56.tgz",
+      "integrity": "sha512-yYOE+5Tvgprqo01vSxIgYTu4fO6sDFfyueVYFgzXx/F0fdHqy0zfAq+gEVjtWG+LvVD/YvR8eRbcBpfvXu1USA==",
+      "dev": true,
+      "dependencies": {
+        "@improbable-eng/grpc-web": "^0.14.0",
+        "@improbable-eng/grpc-web-node-http-transport": "^0.14.0",
+        "@onflow/protobuf": "^0.1.8",
+        "@onflow/rlp": "^0.0.3",
+        "@onflow/util-actor": "0.0.2",
+        "@onflow/util-address": "^0.0.0",
+        "@onflow/util-invariant": "^0.0.0",
+        "@onflow/util-template": "0.0.1",
+        "deepmerge": "^4.2.2",
+        "sha3": "^2.1.4"
       }
     },
     "node_modules/flow-cadut/node_modules/@onflow/types": {
@@ -4281,6 +4319,15 @@
       "resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
       "integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
       "dev": true
+    },
+    "node_modules/flow-cadut/node_modules/rlp": {
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/rlp/-/rlp-3.0.0.tgz",
+      "integrity": "sha512-PD6U2PGk6Vq2spfgiWZdomLvRGDreBLxi5jv5M8EpRo3pU6VEm31KO+HFxE18Q3vgqfDrQ9pZA3FP95rkijNKw==",
+      "dev": true,
+      "bin": {
+        "rlp": "bin/rlp"
+      }
     },
     "node_modules/flow-cadut/node_modules/wrap-ansi": {
       "version": "6.2.0",
@@ -7912,9 +7959,9 @@
       "dev": true
     },
     "node_modules/minimatch": {
-      "version": "3.0.4",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz",
-      "integrity": "sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==",
+      "version": "3.1.2",
+      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
+      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
       "dev": true,
       "dependencies": {
         "brace-expansion": "^1.1.7"
@@ -13674,22 +13721,61 @@
       }
     },
     "flow-cadut": {
-      "version": "https://registry.npmjs.org/flow-cadut/-/flow-cadut-0.1.15-alpha.12.tgz",
-      "integrity": "sha512-/s3lmfR/Ojt/7RS56otR48RjHgIaSDi5+bNWa7DHZUDZk2Q7VLxhN4yFD9PQoRjNfxmuL4vzG+G7FTDXG3Y6/g==",
+      "version": "0.1.15",
+      "resolved": "https://registry.npmjs.org/flow-cadut/-/flow-cadut-0.1.15.tgz",
+      "integrity": "sha512-77lFJvhTGckWtnX/BV25qfe0/wsFbmeBRrRGycWa0uzZeVJV1RSk4VmtGkwHfO32Ndi7Du+87SCV92JUegV/ig==",
       "dev": true,
       "requires": {
         "@onflow/config": "0.0.2",
-        "@onflow/fcl": "^0.0.77",
+        "@onflow/fcl": "^0.0.78",
         "@onflow/types": "^0.0.6",
+        "elliptic": "^6.5.4",
         "esm": "^3.2.25",
         "handlebars": "^4.7.7",
         "handlebars-loader": "^1.7.1",
         "prettier": "^2.3.0",
         "rimraf": "^3.0.2",
+        "rlp": "^3.0.0",
+        "sha3": "^2.1.4",
         "simple-git": "^2.40.0",
         "yargs": "^15.4.1"
       },
       "dependencies": {
+        "@onflow/fcl": {
+          "version": "0.0.78",
+          "resolved": "https://registry.npmjs.org/@onflow/fcl/-/fcl-0.0.78.tgz",
+          "integrity": "sha512-zWtzCjG2URWXLblSsXiSKr3qBroq2BSVGsZrWeosbmup/03fb/MJ10w3ECF83Cd2m/M0TevSSp+hcpdBVLZSfw==",
+          "dev": true,
+          "requires": {
+            "@onflow/interaction": "0.0.11",
+            "@onflow/rlp": "0.0.3",
+            "@onflow/sdk": "0.0.56",
+            "@onflow/types": "0.0.6",
+            "@onflow/util-actor": "0.0.2",
+            "@onflow/util-address": "0.0.0",
+            "@onflow/util-invariant": "0.0.0",
+            "@onflow/util-template": "0.0.1",
+            "@onflow/util-uid": "0.0.1"
+          }
+        },
+        "@onflow/sdk": {
+          "version": "0.0.56",
+          "resolved": "https://registry.npmjs.org/@onflow/sdk/-/sdk-0.0.56.tgz",
+          "integrity": "sha512-yYOE+5Tvgprqo01vSxIgYTu4fO6sDFfyueVYFgzXx/F0fdHqy0zfAq+gEVjtWG+LvVD/YvR8eRbcBpfvXu1USA==",
+          "dev": true,
+          "requires": {
+            "@improbable-eng/grpc-web": "^0.14.0",
+            "@improbable-eng/grpc-web-node-http-transport": "^0.14.0",
+            "@onflow/protobuf": "^0.1.8",
+            "@onflow/rlp": "^0.0.3",
+            "@onflow/util-actor": "0.0.2",
+            "@onflow/util-address": "^0.0.0",
+            "@onflow/util-invariant": "^0.0.0",
+            "@onflow/util-template": "0.0.1",
+            "deepmerge": "^4.2.2",
+            "sha3": "^2.1.4"
+          }
+        },
         "@onflow/types": {
           "version": "0.0.6",
           "resolved": "https://registry.npmjs.org/@onflow/types/-/types-0.0.6.tgz",
@@ -13729,6 +13815,12 @@
           "version": "1.1.4",
           "resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
           "integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
+          "dev": true
+        },
+        "rlp": {
+          "version": "3.0.0",
+          "resolved": "https://registry.npmjs.org/rlp/-/rlp-3.0.0.tgz",
+          "integrity": "sha512-PD6U2PGk6Vq2spfgiWZdomLvRGDreBLxi5jv5M8EpRo3pU6VEm31KO+HFxE18Q3vgqfDrQ9pZA3FP95rkijNKw==",
           "dev": true
         },
         "wrap-ansi": {
@@ -16484,9 +16576,9 @@
       "dev": true
     },
     "minimatch": {
-      "version": "3.0.4",
-      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz",
-      "integrity": "sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==",
+      "version": "3.1.2",
+      "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
+      "integrity": "sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==",
       "dev": true,
       "requires": {
         "brace-expansion": "^1.1.7"
