@@ -14,7 +14,7 @@
     "@babel/preset-env": "^7.16.11",
     "@onflow/types": "^0.0.4",
     "babel-jest": "^27.4.6",
-    "flow-js-testing": "^0.1.15",
+    "flow-js-testing": "^0.3.0-alpha.15",
     "jest": "^27.4.7"
   }
 }
